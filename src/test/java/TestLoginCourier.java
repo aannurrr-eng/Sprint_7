@@ -3,20 +3,35 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import model.CreateCourier;
 import model.LoginCourier;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static data.CourierTestData.*;
 import static steps.CourierSteps.*;
 
-public class TestLoginCourier extends BaseCourierTest{
+public class TestLoginCourier extends BaseAPITest{
+
+    private static CreateCourier courier;
+
+    @BeforeClass
+    public static void globalSetup()
+    {
+        courier = new CreateCourier(genLogin(), genPassword(), genFirstName());
+        createCourier(courier);
+    }
+
+    @AfterClass
+    public static void globalTearDown()
+    {
+        deleteCourier(courier);
+    }
 
     @Test
     @DisplayName("Check successful courier login")
     @Description("Courier with correct data could login")
     public void checkLoginCourier()
     {
-        courier = new CreateCourier(genLogin(), genPassword(), genFirstName());
-        createCourier(courier);
         LoginCourier lCourier = new LoginCourier(courier.getLogin(), courier.getPassword());
         Response response = loginCourier(lCourier);
         checkResponseOfLoginCourier(response);
@@ -37,8 +52,6 @@ public class TestLoginCourier extends BaseCourierTest{
     @Description("Courier with wrong password cannot login")
     public void loginCourierWithWrongPassword()
     {
-        courier = new CreateCourier(genLogin(), genPassword(), genFirstName());
-        createCourier(courier);
         LoginCourier lCourier = new LoginCourier(courier.getLogin(), courier.getPassword() + courier.getPassword());
         Response response = loginCourier(lCourier);
         checkResponseWhenLoginCourierWithWrongData(response);
@@ -49,8 +62,6 @@ public class TestLoginCourier extends BaseCourierTest{
     @Description("Courier without login cannot login")
     public void loginCourierWithoutLogin()
     {
-        courier = new CreateCourier(genLogin(), genPassword(), genFirstName());
-        createCourier(courier);
         LoginCourier lCourier = new LoginCourier("", courier.getPassword());
         Response response = loginCourier(lCourier);
         checkResponseWhenLoginCourierWithoutData(response);
@@ -61,8 +72,6 @@ public class TestLoginCourier extends BaseCourierTest{
     @Description("Courier without password cannot login")
     public void loginCourierWithoutPassword()
     {
-        courier = new CreateCourier(genLogin(), genPassword(), genFirstName());
-        createCourier(courier);
         LoginCourier lCourier = new LoginCourier(courier.getLogin(), "");
         Response response = loginCourier(lCourier);
         checkResponseWhenLoginCourierWithoutData(response);

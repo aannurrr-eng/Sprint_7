@@ -1,22 +1,11 @@
 package model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public class AcceptOrder {
     private int id;
     private int courierId;
-
-    public AcceptOrder(int id, int courierId) {
-        this.id = id;
-        this.courierId = courierId;
-    }
-
-    public int getId()
-    {
-        return id;
-    }
-
-    public int getCourierId()
-    {
-        return courierId;
-    }
-
 }

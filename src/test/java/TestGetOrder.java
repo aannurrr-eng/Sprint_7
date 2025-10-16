@@ -2,6 +2,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import model.Order;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static data.OrderTestData.*;
@@ -15,10 +17,10 @@ import static steps.OrderSteps.*;
 
 public class TestGetOrder extends BaseAPITest {
 
-    @Test
-    @DisplayName("Check getting order")
-    @Description("Check successful getting of order")
-    public void checkGettingOrder()
+    private static int track;
+
+    @BeforeClass
+    public static void globalSetup()
     {
         Order order = new Order.Builder()
                 .withFirstName(FIRST_NAME)
@@ -31,12 +33,22 @@ public class TestGetOrder extends BaseAPITest {
                 .withComment(COMMENT)
                 .withColor(COLOR)
                 .build();
-        int track = createOrderAntGetTrack(order);
+        track = createOrderAndGetTrack(order);
+    }
 
+    @AfterClass
+    public static void globalTearDown()
+    {
+        cancelOrder(track);
+    }
+
+    @Test
+    @DisplayName("Check getting order")
+    @Description("Check successful getting of order")
+    public void checkGettingOrder()
+    {
         Response response = getOrderByTrack(track);
         checkResponseOfGettingOrder(response);
-
-        cancelOrder(track);
     }
 
     @Test

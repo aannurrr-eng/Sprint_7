@@ -1,11 +1,10 @@
 package model;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class IdCourier {
     private String id;
-
-    public IdCourier(String id) {
-        this.id = id;
-    }
 
     public int getId()
     {

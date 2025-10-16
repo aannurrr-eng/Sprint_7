@@ -2,13 +2,31 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import model.CreateCourier;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 
 import static data.CourierTestData.*;
 import static steps.CourierSteps.*;
 
-public class TestCreateCourier extends BaseCourierTest {
+public class TestCreateCourier extends BaseAPITest {
+
+    protected CreateCourier courier;
+
+    @Before
+    public void setup()
+    {
+        setCourierCreated(false);
+    }
+
+    @After
+    public void tearDown()
+    {
+        if (!getCourierCreated())
+            return;
+        deleteCourier(courier);
+    }
 
     @Test
     @DisplayName("Check courier successful creation")

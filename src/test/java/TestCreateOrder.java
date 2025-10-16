@@ -2,6 +2,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import model.Order;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -12,23 +14,39 @@ import static steps.OrderSteps.*;
 @RunWith(Parameterized.class)
 public class TestCreateOrder extends BaseAPITest {
 
-    private String[] color;
+    private int track;
 
-    public TestCreateOrder(String[] color)
+    @Before
+    public void setup()
     {
-        this.color = color;
+        setOrderCreated(false);
     }
 
+    @After
+    public void tearDown()
+    {
+        if (!getOrderCreated())
+            return;
+        cancelOrder(track);
+    }
 
-    @Parameterized.Parameters
+    private String colorName;
+    private String[] color;
+
+    public TestCreateOrder(String colorName, String[] color)
+    {
+        this.colorName = colorName; this.color = color;
+    }
+
+    @Parameterized.Parameters(name = "{0}")
     public static Object[][] getData()
     {
-        return new Object[][]{
-                {new String[] {"BLACK"}},
-                {new String[] {"GREY"}},
-                {new String[] {"BLACK", "GREY"}},
-                {null}
-                };
+       return new Object[][]{
+                {"BLACK", new String[] {"BLACK"}},
+                {"GREY", new String[] {"GREY"}},
+                {"BLACK, GREY", new String[] {"BLACK", "GREY"}},
+                {"null", null}
+        };
     }
 
     @Test
@@ -48,7 +66,6 @@ public class TestCreateOrder extends BaseAPITest {
                 .withColor(color)
                 .build();
         Response response = createOrder(order);
-        int track = checkCreation(response);
-        cancelOrder(track);
+        track = checkCreation(response);
     }
 }

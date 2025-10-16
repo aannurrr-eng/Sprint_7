@@ -8,30 +8,40 @@ import model.Order;
 
 import java.net.HttpURLConnection;
 
+import static data.EndPoints.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 
 public class OrderSteps {
 
-    @Step("Create order: send post request to /api/v1/orders")
-    public static Response createOrder(Order order)
+    private static boolean orderCreated = false;
+    public static void setOrderCreated(boolean created)
     {
-        return given()
-                .contentType(ContentType.JSON)
-                .body(order)
-                .when()
-                .post("/api/v1/orders");
+        orderCreated = created;
+    }
+    public static boolean getOrderCreated()
+    {
+        return orderCreated;
     }
 
     @Step("Create order: send post request to /api/v1/orders")
-    public static int createOrderAntGetTrack(Order order)
+    public static Response createOrder(Order order)
     {
-        return given()
+        Response response = given()
                 .contentType(ContentType.JSON)
                 .body(order)
                 .when()
-                .post("/api/v1/orders")
+                .post(CREATE_ORDER);
+        if (!orderCreated)
+            orderCreated = (response.getStatusCode() == HttpURLConnection.HTTP_CREATED);
+        return response;
+    }
+
+    @Step("Create order: send post request to /api/v1/orders")
+    public static int createOrderAndGetTrack(Order order)
+    {
+        return createOrder(order)
                 .then()
                 .extract()
                 .path("track");
@@ -43,7 +53,7 @@ public class OrderSteps {
         given()
                 .contentType(ContentType.JSON)
                 .queryParam("track", track)
-                .put("/api/v1/orders/cancel");
+                .put(CANCEL_ORDER);
     }
 
     @Step("Check response code of creation and containing of 'track' key ")
@@ -59,7 +69,7 @@ public class OrderSteps {
     public static Response getOrderList()
     {
         return given()
-                .get("/api/v1/orders");
+                .get(GET_ORDERS);
     }
 
     @Step("Check response has order list")
@@ -76,7 +86,7 @@ public class OrderSteps {
         return given()
                 .contentType(ContentType.JSON)
                 .queryParam("courierId", order.getCourierId())
-                .put(String.format("/api/v1/orders/accept/%d", order.getId()));
+                .put(String.format(ACCEPT_ORDER, order.getId()));
     }
 
     @Step("Check status code and body of response")
@@ -94,7 +104,7 @@ public class OrderSteps {
         return given()
                 .contentType(ContentType.JSON)
                 .queryParam("t", track)
-                .get("/api/v1/orders/track");
+                .get(GET_ORDER_BY_TRACK);
     }
 
     @Step("Check status code and body of request")
@@ -111,7 +121,7 @@ public class OrderSteps {
     {
         return given()
                 .contentType(ContentType.JSON)
-                .get("/api/v1/orders/track");
+                .get(GET_ORDER_BY_TRACK);
     }
 
     @Step("Check status code and message of response")
@@ -148,7 +158,7 @@ public class OrderSteps {
         return given()
                 .contentType(ContentType.JSON)
                 .queryParam("courierId", order.getCourierId())
-                .put("/api/v1/orders/accept/null");
+                .put(ACCEPT_ORDER_NULL_ID);
     }
 
     @Step("Accept order without courierId: send put request to /api/v1/orders/accept/:id")
@@ -156,7 +166,7 @@ public class OrderSteps {
     {
         return given()
                 .contentType(ContentType.JSON)
-                .put(String.format("/api/v1/orders/accept/%d", order.getId()));
+                .put(String.format(ACCEPT_ORDER, order.getId()));
     }
 
     @Step("Check response when accept order without data")

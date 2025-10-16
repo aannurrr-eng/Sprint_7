@@ -9,6 +9,7 @@ import model.LoginCourier;
 
 import java.net.HttpURLConnection;
 
+import static data.EndPoints.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
@@ -35,7 +36,7 @@ public class CourierSteps {
                 .contentType(ContentType.JSON)
                 .body(courier)
                 .when()
-                .post("/api/v1/courier");
+                .post(CREATE_COURIER);
         if (!courierCreated)
             courierCreated = (response.getStatusCode() == HttpURLConnection.HTTP_CREATED);
         return response;
@@ -75,7 +76,7 @@ public class CourierSteps {
                 .contentType(ContentType.JSON)
                 .body(courier)
                 .when()
-                .post("/api/v1/courier/login");
+                .post(LOGIN_COURIER);
     }
 
     @Step("Check successful login and containing of 'id' key in response")
@@ -128,7 +129,7 @@ public class CourierSteps {
                 .contentType(ContentType.JSON)
                 .body(courier)
                 .when()
-                .delete(String.format("/api/v1/courier/%d", id));
+                .delete(String.format(DELETE_COURIER, id));
     }
 
     @Step("Check status code and body of response")
@@ -152,12 +153,12 @@ public class CourierSteps {
     @Step("Delete courier without id: send delete request to /api/v1/courier/null")
     public static Response deleteCourier()
     {
-        String json = "{\"id\": \"\"}";
+        IdCourier courier = new IdCourier("");
         return given()
                 .contentType(ContentType.JSON)
-                .body(json)
+                .body(courier)
                 .when()
-                .delete("/api/v1/courier/null");
+                .delete(DELETE_COURIER_NULL_ID);
     }
 
     @Step("Check status code and message of request")

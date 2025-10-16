@@ -1,11 +1,13 @@
 import io.restassured.RestAssured;
-import org.junit.Before;
+import org.junit.BeforeClass;
+
+import static data.Url.URL;
 
 public class BaseAPITest{
-    @Before
-    public void startUp()
+    @BeforeClass
+    public static void globalBaseAPISetup()
     {
-        RestAssured.baseURI = "http://qa-scooter.praktikum-services.ru";
+        RestAssured.baseURI = URL;
     }
 
 }
