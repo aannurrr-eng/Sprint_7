@@ -4,9 +4,7 @@ import io.restassured.response.Response;
 import model.AcceptOrder;
 import model.CreateCourier;
 import model.Order;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import static data.CourierTestData.*;
 import static data.OrderTestData.*;
@@ -21,16 +19,20 @@ import static steps.OrderSteps.*;
 public class TestAcceptOrder extends BaseAPITest{
 
     private static int courierId;
-    private static int track;
-    private static int id;
+    private int track;
+    private int id;
 
-    @Before
-    public void setup()
+    @BeforeClass
+    public static void globalSetup()
     {
         CreateCourier courier = new CreateCourier(genLogin(), genPassword(), genFirstName());
         createCourier(courier);
         courierId = courierId(courier);
+    }
 
+    @Before
+    public void setup()
+    {
         Order order = new Order.Builder()
                 .withFirstName(FIRST_NAME)
                 .withLastName(LAST_NAME)
@@ -46,13 +48,17 @@ public class TestAcceptOrder extends BaseAPITest{
         id = getOrderIdByTrack(track);
     }
 
+    @AfterClass
+    public static void globalTearDown()
+    {
+        deleteCourier(courierId);
+    }
+
     @After
     public void tearDown()
     {
-        deleteCourier(courierId);
         cancelOrder(track);
     }
-
 
     @Test
     @DisplayName("Check acceptance of order")
